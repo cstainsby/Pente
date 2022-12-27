@@ -36,18 +36,27 @@ def test_single_placement():
 
 def test_multiple_placements():
   game = init_empty_game(9, 9)
-  game.register_move(1, 4, 2)
-  game.register_move(2, 5, 7)
-  game.register_move(1, 1, 8)
-  game.register_move(2, 3, 2)
-  game.register_move(1, 4, 4)
-  game.register_move(2, 6, 2)
-  game.register_move(1, 6, 7)
-  game.register_move(2, 1, 1)
-  game.register_move(1, 0, 7)
-  game.register_move(2, 8, 8)
+
+  placement_coordinates = {
+    1: [(4,2), (5,7), (1,8), (3,2), (4,4), (6,2), (6,7), (1,1), (0,7), (8,8)],
+    2: [(3,3)]
+  }
+
+  for player_key in placement_coordinates.keys():
+    for x, y in placement_coordinates[player_key]:
+      game.register_move(player_key, x, y)
+
+  print(game.GAME_BOARD)
+
+  for i in range(9):
+    for j in range(9):
+      if placement_coordinates[1].count((j, i)) == 1:
+        assert game.GAME_BOARD[i][j] == 1
+      elif placement_coordinates[2].count((j, i)) == 1:
+        assert game.GAME_BOARD[i][j] == 2
+      else: 
+        assert game.GAME_BOARD[i][j] == 0
   
-  assert game.GAME_BOARD[2][4] == 1
 
 def test_placement_out_of_bounds():
   game = init_empty_game(9, 9)
@@ -69,24 +78,61 @@ def test_placement_on_an_occupied_intersection():
   
   assert game.register_move(2, 5, 7) == ValueError
 
+# ------------------------------------------------------------------
+#  test get last move
+# ------------------------------------------------------------------
+
+def test_get_last_move():
+  game = init_empty_game(9, 9)
+
+  # no moves played 
+  assert game.get_last_move() == None 
+
+  game.register_move(1, 1, 4)
+
+  print(game.game_log)
+  print(len(game.game_log))
+  assert game.get_last_move() == ("PLACEMENT", 1, 1, 4)
 
 # ------------------------------------------------------------------
 #  test check five 
 # ------------------------------------------------------------------
-def test_empty_board_check_five():
+def test_basic_board_check_five():
+
+  # test all directions
+  # horizontal
   game = init_empty_game(9, 9)
+  for i in range(5):
+    game.register_move(1, i, 5)
+  
+  print(game.game_log[-1])
+  assert game.check_five_in_a_row() == True
 
-  # add a move so that check works
-  game.game_log.append(
-    (
-      0, # player_id
-      3, # x_position 
-      5  # y_position
-    )
-  )
+  # vertical
+  game = init_empty_game(9, 9)
+  for i in range(5):
+    game.register_move(1, 5, i)
+  
+  assert game.check_five_in_a_row() == True
 
-  assert game
+  # left diagonal 
+  game = init_empty_game(9, 9)
+  for i in range(5):
+    game.register_move(1, i, i)
+  
+  assert game.check_five_in_a_row() == True 
 
+  # right diagonal 
+  game = init_empty_game(9, 9)
+  for i in range(5):
+    game.register_move(1, 8 - i, i)
+  
+  assert game.check_five_in_a_row() == True 
+
+
+
+def test_with_other_player_plays_check_five():
+  game = init_empty_game(9, 9)
 
 # ------------------------------------------------------------------
 #  test captures

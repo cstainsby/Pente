@@ -90,12 +90,18 @@ class PenteGame():
 
     DESC: uses the game log to find the last move that was made 
     """ 
+    last_move = None
     log_index = 0
 
-    while(self.game_log[log_index][0] != self.LOG_TYPE_IDS["PLACEMENT"]):
+    while(log_index < len(self.game_log) and self.game_log[log_index][0] != self.LOG_TYPE_IDS["PLACEMENT"]):
       log_index += 1
     
-    return self.game_log[log_index]
+    print("index", log_index)
+    print("len game log", len(self.game_log))
+    if log_index < len(self.game_log):
+      last_move = self.game_log[log_index]
+    
+    return last_move
 
 
   def get_directional_lists_from_point(self, x, y):
