@@ -8,8 +8,8 @@ import random
 import numpy as np
 
 class PenteGame():
-  def __init__(self) -> None:
-    self.GRID_LENGTH = 19
+  def __init__(self, GRID_LENGTH = 19) -> None:
+    self.GRID_LENGTH = GRID_LENGTH
     self.GAME_BOARD = [[0 for i in range(self.GRID_LENGTH)] for j in range(self.GRID_LENGTH)]
 
     self.players = []
@@ -33,6 +33,7 @@ class PenteGame():
     """
     for i in range(self.GRID_LENGTH):
       print(self.GAME_BOARD[i])
+    print()
 
   
   def main_game_loop(self) -> None:
@@ -91,14 +92,12 @@ class PenteGame():
     DESC: uses the game log to find the last move that was made 
     """ 
     last_move = None
-    log_index = 0
+    log_index = len(self.game_log) - 1 # start at end of list 
 
-    while(log_index < len(self.game_log) and self.game_log[log_index][0] != self.LOG_TYPE_IDS["PLACEMENT"]):
-      log_index += 1
+    while(log_index >= 0 and self.game_log[log_index][0] != "PLACEMENT"):
+      log_index -= 1
     
-    print("index", log_index)
-    print("len game log", len(self.game_log))
-    if log_index < len(self.game_log):
+    if log_index >= 0:
       last_move = self.game_log[log_index]
     
     return last_move
@@ -122,17 +121,19 @@ class PenteGame():
 
     # \ diagonal
     offset = x - y
-    left_diag_list = np_game_board.diagonal(offset)
+    left_diag_list = list(np_game_board.diagonal(offset))
 
     # / diagonal
     offset = len(self.GAME_BOARD) - 1 - x - y
-    right_diag_list = np_game_board.diagonal(offset)
+    right_diag_list = list(np.fliplr(np_game_board).diagonal(offset))
 
     # - horizontal
-    horizontal_list = np_game_board[y]
+    horizontal_list = list(np_game_board[y])
 
     # | vertical
-    vertical_list = np_game_board[:, x]
+    vertical_list = list(np_game_board[:, x])
+
+
 
     return left_diag_list, right_diag_list, horizontal_list, vertical_list
 
@@ -143,7 +144,9 @@ class PenteGame():
     DESC: using the directional lists from the last played point, check if the most recent play created a 
           sequence of five stones, all placed by a single player, in a row
     """
-
+    if len(self.game_log) == 0: # following code relies on knowing what the last play was
+      return False              # catch this if the log is empty
+    
     _, player_id, intersection_x_played_on, intersection_y_played_on = self.get_last_move()
 
     left_diag_list, right_diag_list, horizontal_list, vertical_list = self.get_directional_lists_from_point(intersection_x_played_on, intersection_y_played_on)
@@ -171,6 +174,8 @@ class PenteGame():
         if highest_sequence > 4:
           self.game_log.append(("WIN", player_id))
           return True 
+      
+      print("highest sequence: ", highest_sequence)
     
     return False
 
@@ -211,35 +216,41 @@ class PenteGame():
               self.GAME_BOARD[intersection_y_played_on - 1][intersection_x_played_on - 1] = 0
               self.GAME_BOARD[intersection_y_played_on - 2][intersection_x_played_on - 2] = 0
             elif raw_list_index == 1: # right diagonal 
+              print("in ls right diag")
+              print(intersection_x_played_on)
+              print(intersection_y_played_on)
               self.GAME_BOARD[intersection_y_played_on - 1][intersection_x_played_on + 1] = 0
               self.GAME_BOARD[intersection_y_played_on - 2][intersection_x_played_on + 2] = 0
             elif raw_list_index == 2: # horizontal
               self.GAME_BOARD[intersection_y_played_on][intersection_x_played_on - 1] = 0
               self.GAME_BOARD[intersection_y_played_on][intersection_x_played_on - 2] = 0
             elif raw_list_index == 3: # vertical 
-              self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on] = 0
-              self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on] = 0
+              self.GAME_BOARD[intersection_y_played_on - 1][intersection_x_played_on] = 0
+              self.GAME_BOARD[intersection_y_played_on - 2][intersection_x_played_on] = 0
             
 
         # for the "right" side values 
         if len(rs_values) >= 3 and rs_values[0] != player_id:
-          non_curr_player_id = ls_values[0]
+          non_curr_player_id = rs_values[0]
 
-          if ls_values[1] == non_curr_player_id and ls_values[2] == player_id:
+          if rs_values[1] == non_curr_player_id and rs_values[2] == player_id:
             # then pieces at indices -2 and -1 should be "captured", 
             # base on the raw list index, "direction" of list, replace game_board values 
             if raw_list_index == 0: # left diagonal 
               self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on + 1] = 0
               self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on + 2] = 0
             elif raw_list_index == 1: # right diagonal 
+              print("in ls right diag")
+              print(intersection_x_played_on)
+              print(intersection_y_played_on)
               self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on - 1] = 0
               self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on - 2] = 0
             elif raw_list_index == 2: # horizontal
               self.GAME_BOARD[intersection_y_played_on][intersection_x_played_on + 1] = 0
               self.GAME_BOARD[intersection_y_played_on][intersection_x_played_on + 2] = 0
             elif raw_list_index == 3: # vertical 
-              self.GAME_BOARD[intersection_y_played_on - 1][intersection_x_played_on] = 0
-              self.GAME_BOARD[intersection_y_played_on - 2][intersection_x_played_on] = 0
+              self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on] = 0
+              self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on] = 0
 
     
 
