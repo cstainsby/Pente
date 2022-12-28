@@ -6,16 +6,27 @@
 
 import random 
 import numpy as np
+import math
 
 class PenteGame():
-  def __init__(self, GRID_LENGTH = 19) -> None:
+  def __init__(self, GRID_LENGTH = 19, player_dict = {1: "RANDOM", 2: "RANDOM"}) -> None:
+    # NOTE: GRID_LENGTH must be an odd number >= 3
+    if GRID_LENGTH < 3 or GRID_LENGTH % 2 != 1:
+      return 
+
     self.GRID_LENGTH = GRID_LENGTH
     self.GAME_BOARD = [[0 for i in range(self.GRID_LENGTH)] for j in range(self.GRID_LENGTH)]
 
+    # create players based off player dict
     self.players = []
+    for player_id in player_dict.keys():
+      player_type = player_dict[player_id] # should be a string detailing what type the player is
+      new_player = Player(player_id=player_id, play_type_option=player_type)
+      self.players.append(new_player)    
+
     self.current_player_turn = 0
 
-    self.pairs_captured = [] # parallel to players, keeps track of the number of pairs that players captured
+    self.pairs_captured = [0] * len(self.players) # parallel to players, keeps track of the number of pairs that players captured
 
     # a log of each move made in the game
     # NOTE: every log message will have a type in the first col
@@ -125,7 +136,11 @@ class PenteGame():
 
     # / diagonal
     offset = len(self.GAME_BOARD) - 1 - x - y
-    right_diag_list = list(np.fliplr(np_game_board).diagonal(offset))
+    right_diag_list_reversed = list(np.fliplr(np_game_board).diagonal(offset)) 
+    right_diag_list = list(reversed(right_diag_list_reversed)) # because we fliped the list to use .diagonal, reverse it back
+    print("right diag list", right_diag_list)
+    self.pretty_print_game()
+    print("after reverse", right_diag_list)
 
     # - horizontal
     horizontal_list = list(np_game_board[y])
@@ -133,9 +148,47 @@ class PenteGame():
     # | vertical
     vertical_list = list(np_game_board[:, x])
 
-
-
     return left_diag_list, right_diag_list, horizontal_list, vertical_list
+
+
+  def coordinates_in_2d_plane_to_right_diagonal_position(self, x_cor: int, y_cor: int) -> int:
+    postion = 0
+
+    center_index = (self.GRID_LENGTH - 1) / 2
+
+    x_offset_from_center = center_index - x_cor
+    y_offset_from_center = center_index - y_cor
+    diagonal_offset = abs(x_offset_from_center - y_offset_from_center)
+    print("diagonal offset", diagonal_offset)
+
+    # equation to find num elements at given diagonal
+    num_elements_in_diagonal = -abs(center_index - diagonal_offset) - diagonal_offset + 1
+    print("num elements", num_elements_in_diagonal)
+
+    # the more extreme the difference between these two the futher the point is from the left diagonal
+    offset_difference = abs(x_offset_from_center) - abs(y_offset_from_center)
+    # if offset_difference > 0:
+    #   position = num_elements_in_diagonal / 2
+    # else:
+    #   postition
+
+      
+
+
+    return postion
+
+  def coordinates_in_2d_plane_to_left_diagonal_position(self, x_cor, y_cor):
+
+    generated_list_of_coordinates = [] 
+    # each position within the diagonal will always have their x_cor and y_cor sum to the same thing
+    postion = 0
+
+    # abs(grid_size - x + y) = num elements in diagonal
+    self.grid_length - x_cor + y_cor
+
+
+
+    return postion
 
 
   def check_five_in_a_row(self) -> bool:
@@ -193,21 +246,34 @@ class PenteGame():
 
     # package into list in order to cut down on repeated code
     # shape: [(index_of_new_placement, the list)]
+    print()
+    print("right list", right_diag_list)
+    print("place index: ", intersection_x_played_on)
     raw_lists = [
-      (intersection_y_played_on, left_diag_list),    # for both the diagonals, y placement can determine 
-      (intersection_y_played_on,  right_diag_list),  # the order of the list
+      (intersection_y_played_on, left_diag_list),   #TODO fix diag coordinate system
+      (intersection_y_played_on,  right_diag_list),  
       (intersection_x_played_on, horizontal_list), 
       (intersection_y_played_on, vertical_list)
     ]
     for raw_list_index, (place_index, raw_list) in enumerate(raw_lists):
+      print()
+      print("raw list index", raw_list_index)
+      print("raw_list", raw_list)
       if len(raw_list) >= 4: # not worth considering rows which cant contain enough stones to make a capture sequence 
+        # ls_values will contain all values to the left of the placement index, rs_values to the right
         ls_values = raw_list[:place_index]
         rs_values = raw_list[place_index + 1:] # NOTE: adding 1 to make rs non-inclusve to placement spot
 
-
+        print("ls vals", ls_values)
+        print("rs values", rs_values)
+        print("place index", place_index)
         # for the "left" side values 
-        if len(ls_values) >= 3 and ls_values[-1] != player_id:
+        if len(ls_values) >= 3 and ls_values[place_index - 3] != player_id:
           non_curr_player_id = ls_values[-1]
+
+          print("ls -2", ls_values[-2])
+          print("ls -3", ls_values[-3])
+          print(ls_values)
 
           if ls_values[-2] == non_curr_player_id and ls_values[-3] == player_id:
             # then pieces at indices -2 and -1 should be "captured", 
@@ -240,7 +306,7 @@ class PenteGame():
               self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on + 1] = 0
               self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on + 2] = 0
             elif raw_list_index == 1: # right diagonal 
-              print("in ls right diag")
+              print("in rs right diag")
               print(intersection_x_played_on)
               print(intersection_y_played_on)
               self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on - 1] = 0
@@ -255,9 +321,6 @@ class PenteGame():
     
 
   def start(self, num_players: int):
-    self.players = [Player(i + 1) for i in range(num_players)]
-    self.pairs_captured = [0] * num_players
-
     # order of players in players array determines order, randomize for consistancy
     random.shuffle(self.players())
 
@@ -282,6 +345,7 @@ class Player():
       "PLAYER": 99
     }
 
+    # selected play type option
     if list(self.PLAY_DESCISION_OPTIONS.keys()).count(play_type_option) == 1:
       self.selected_play_type_option = self.PLAY_DESCISION_OPTIONS[play_type_option]
     else:
