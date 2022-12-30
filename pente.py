@@ -6,7 +6,6 @@
 
 import random 
 import numpy as np
-import math
 
 class PenteGame():
   def __init__(self, GRID_LENGTH = 19, player_dict = {1: "RANDOM", 2: "RANDOM"}) -> None:
@@ -214,10 +213,8 @@ class PenteGame():
       vertical_list
     ]
     for raw_list in raw_lists:
-      # for now I'm going to use a naive approach to finding the five in a row 
-      # where I will just find the longest string of player_id and return true if 
+      # find the longest string of player_id and return true if 
       # there is one greater than 4
-      # TODO: there is a more optimized way to do this
       highest_sequence = 0
 
       for intersection_value in raw_list:
@@ -251,7 +248,7 @@ class PenteGame():
     # package into list in order to cut down on repeated code
     # shape: [(index_of_new_placement, the list)]
     raw_lists = [
-      (left_diag_index_played_on, left_diag_list),   #TODO fix diag coordinate system
+      (left_diag_index_played_on, left_diag_list),   
       (right_diag_index_played_on,  right_diag_list),  
       (intersection_x_played_on, horizontal_list), 
       (intersection_y_played_on, vertical_list)
@@ -299,7 +296,7 @@ class PenteGame():
 
     
 
-  def start(self, num_players: int):
+  def start(self):
     # order of players in players array determines order, randomize for consistancy
     random.shuffle(self.players())
 
@@ -321,7 +318,7 @@ class Player():
     self.PLAY_DESCISION_OPTIONS = {
       "RANDOM": 0,
       "AI": 1,
-      "PLAYER": 99
+      "HUMAN": 99
     }
 
     # selected play type option
@@ -363,4 +360,4 @@ class Player():
 
 if __name__ == "__main__":
   game = PenteGame()
-  game.start(2)
+  game.start()
