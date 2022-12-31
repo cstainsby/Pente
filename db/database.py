@@ -31,3 +31,25 @@ class PenteDatabase():
   
   def insert_game(self, game_log):
     pass
+
+
+  # ----------------------------------------------------------------------------------------------
+  #   analytics queries 
+  # ----------------------------------------------------------------------------------------------
+  def get_number_of_games_played(self):
+    num_games = 0
+    if self.has_valid_connection():
+      cur = self.conn.execute("SELECT COUNT(*) FROM PenteGame;")
+      num_games = cur.fetchall()
+    
+    return num_games
+
+
+  def get_number_of_wins_by_player_type(self, player_type: str):
+    if self.has_valid_connection():
+      self.conn.execute("""
+        SELECT COUNT(*) 
+        FROM GameWins g
+          JOIN PlayersList pl USING (game_id, player_num)
+        WHERE pl.player_type = \"{}\"
+      """.format(player_type))
