@@ -60,8 +60,10 @@ class PenteDatabase():
         VALUES ({}, {});
     """.format(game_id, winning_player_id))
 
-    # insert all placements 
-    for place_num, log in enumerate(pente_game.game_log):
+    # insert all placements and captures
+    place_num = 0
+    cap_num = 0
+    for log in pente_game.game_log:
       if log[0] == "PLACEMENT": #NOTE: as defined in pente.py the first col will define log type
         player_id_who_placed = log[1]
         place_x = log[2]
@@ -71,23 +73,58 @@ class PenteDatabase():
           INSERT INTO Placements (game_id, place_num, player_num, place_x, place_y)
             VALUES ({}, {}, {}, {}, {});
         """.format(game_id, place_num, player_id_who_placed, place_x, place_y))
-    
-    # insert all captures
-    for place_num, log in enumerate(pente_game.game_log):
-      if log[0] == "CAPTURE": #NOTE: as defined in pente.py the first col will define log type
-        player_id_who_captured = log[1]
-        place_x = log[2]
-        place_y = log[3]
+
+        place_num += 1
+      
+      elif log[0] == "CAPTURE": #NOTE: as defined in pente.py the first col will define log type
+        place_x = log[2][0][0]
+        place_y = log[2][0][1]
+        last_place_num = place_num - 1
+
+        next_x = log[2][1][0]
+        next_y = log[2][1][1]
+
+        # NOTE: how this is numbered is explained in the table_setup_script.py file
+        direction = 0
+
+        if place_x > next_x:
+          if place_y > next_y:   direction = 5
+          elif place_y < next_y: direction = 3
+          else:                  direction = 4
+        elif place_x < next_x:
+          if place_y > next_y:   direction = 7
+          elif place_y < next_y: direction = 1
+          else:                  direction = 0
+        else:
+          if place_y > next_y:   direction = 6
+          elif place_y < next_y: direction = 2
 
         self.conn.execute("""
-          INSERT INTO Placements (game_id, place_num, player_num, place_x, place_y)
+          INSERT INTO Placements (game_id, cap_num, capturing_place_num, cap_direction)
             VALUES ({}, {}, {}, {}, {});
-        """.format(game_id, place_num, player_id_who_placed, place_x, place_y))
+        """.format(game_id, cap_num, last_place_num, direction))
 
-  def get_game_by_game_id(self):
-    game_log = []
+        cap_num += 1
+      
 
-    return game_log
+  def get_game_by_game_id(self, game_id):
+
+    players_table_res = self.conn.execute("""
+      SELECT game_id, grid_length, player_num, player_type
+      FROM PenteGame 
+        JOIN PlayersList USING (game_id)
+        JOIN GameWins USING (player_num)
+      WHERE game_id = {}
+    """.format(game_id))
+
+    pente_game = PenteGame()
+
+    # inflate the game state
+    #TODO this is an inefficient way to rebuild the game state, 
+    #     a better way should be found eventually 
+
+
+    return pente_game 
 
 
   # ----------------------------------------------------------------------------------------------

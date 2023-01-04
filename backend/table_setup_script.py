@@ -114,6 +114,7 @@ if conn:
     # peices can be captured at once this will be a much better solution 
 
     # number mapping to direction 
+    # NOTE: point (0,0) is in the top left, x increases right and y increases down
     #   1  2  3
     #    \ | /
     # 0 -- x -- 4
