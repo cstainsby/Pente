@@ -1,0 +1,19 @@
+[Game "Pente"]
+[Site "Pente.org"]
+[Event "Turn-based Game"]
+[Round "-"]
+[Section "-"]
+[Date "08/25/2005"]
+[Time "22:17:00"]
+[TimeControl "7"]
+[Rated "N"]
+[Player 1 Name "dweebo"]
+[Player 2 Name "mmammel"]
+[Player 1 Rating "1600"]
+[Player 2 Rating "1600"]
+[Player 1 Type "Human"]
+[Player 2 Type "Human"]
+[Result "1-0"]
+
+1. K10 K11 2. N10 H9 3. N12 L9 4. L10 J10 5. M10 O10 6. L12 K9 7. H11 M11 8. L8
+J10 9. M12 K12 10. K13 K12 11. N8 P9 12. N9 N11 13. P12 1-0
