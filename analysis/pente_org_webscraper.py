@@ -1,6 +1,12 @@
+# --------------------------------------------------------------------------
+# FILE: pente_org_webscraper.py
+# NAME: Cole Stainsby
+# DESC: A python script which generates scrapes game data off of pente.org
+# --------------------------------------------------------------------------
 
 from bs4 import BeautifulSoup as bs
 import requests
+import time
 
 from pente_org_certs import pente_org_certs # a separte .py file containing a dictionary with login info
 
@@ -64,7 +70,9 @@ def main():
   # attempt a request for data, if not signed in sign in
   session = log_in(session)
 
-  for game_id in range(1, 543842): # this number is the highest the database currently goes to
+  for game_id in range(2352, 543842): # this number is the highest the database currently goes to
+    time.sleep(0.5) # to be kind on their servers
+    print("current game id", game_id)
     data = get_data_at_req_endpoint(session, game_id)
 
     if data:
