@@ -1,0 +1,21 @@
+
+version: "0.0"
+services:
+  backend: 
+    container_name: pente_game_backend
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    image: pente_game_backend_img
+    ports:
+      - "8000:8000"
+  frontend:
+    container_name: frontend
+    restart: always
+    command: npm start
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    stdin_open: true

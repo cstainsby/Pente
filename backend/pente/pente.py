@@ -62,7 +62,7 @@ class PenteGame():
     while not five_in_row_found and not five_pairs_captured:
 
       # have player generate their move 
-      x, y = self.player[player_counter].make_choice()
+      x, y = self.players[player_counter].make_turn_choice(self.GAME_BOARD)
 
       # register players move with board
       self.register_move(player_counter, x, y)
@@ -297,8 +297,6 @@ class PenteGame():
     
 
   def start(self):
-    # order of players in players array determines order, randomize for consistancy
-    random.shuffle(self.players())
 
     self.main_game_loop()
 
