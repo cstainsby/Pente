@@ -15,6 +15,7 @@ def update_table_prompt(table_name) -> bool:
   delete_table_res_raw = input("Do you want to update table \"" + table_name + "\" [y/n]")
 
   if delete_table_res_raw == "y":
+    print(table_name + " table changes pushed")
     return True 
   return False
 
@@ -122,15 +123,13 @@ if conn:
       CREATE TABLE Captures (
         game_id INT, 
         cap_num INT,
-        player_num INT NOT NULL,
-        place_x INT NOT NULL,
-        place_y INT NOT NULL,
+        capturing_place_num INT NOT NULL,
 
         cap_direction INT NOT NULL,
 
         PRIMARY KEY (game_id, cap_num),
         FOREIGN KEY (game_id) REFERENCES PenteGame(game_id),
-        FOREIGN KEY (player_num) REFERENCES PlayersList(player_num),
+        FOREIGN KEY (capturing_place_num) REFERENCES Placements(place_num),
 
         CONSTRAINT valid_cap_num CHECK (cap_num >= 0),
         CONSTRAINT valid_cap_direction CHECK (cap_direction >= 0 AND cap_direction <= 7)

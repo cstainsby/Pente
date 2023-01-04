@@ -1,5 +1,5 @@
 
-from pente import PenteGame
+from pente.pente import PenteGame
 
 class EventListener():
   

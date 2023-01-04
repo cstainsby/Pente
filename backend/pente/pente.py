@@ -315,15 +315,15 @@ class Player():
   def __init__(self, player_id: int, play_type_option: str) -> None:
     self.player_id = player_id # each player gets an id 
 
-    self.PLAY_DESCISION_OPTIONS = {
-      "RANDOM": 0,
-      "AI": 1,
-      "HUMAN": 99
-    }
+    self.PLAY_DESCISION_OPTIONS = [
+      "RANDOM",
+      "AI",
+      "HUMAN"
+    ]
 
     # selected play type option
-    if list(self.PLAY_DESCISION_OPTIONS.keys()).count(play_type_option) == 1:
-      self.selected_play_type_option = self.PLAY_DESCISION_OPTIONS[play_type_option]
+    if self.PLAY_DESCISION_OPTIONS.count(play_type_option) == 1:
+      self.selected_play_type_option = play_type_option
     else:
       return TypeError
     
@@ -343,15 +343,15 @@ class Player():
     current_choices = [(x, y) for y in range(board_length) for x in range(board_length) if game_board[y][x] == 0]
     choice = None
 
-    if self.selected_play_type_option == self.PLAY_DESCISION_OPTIONS["RANDOM"]:
+    if self.selected_play_type_option == "RANDOM":
       random.shuffle(current_choices)
       choice = current_choices[0] 
 
-    elif self.selected_play_type_option == self.PLAY_DESCISION_OPTIONS["AI"]:
+    elif self.selected_play_type_option == "AI":
       # TODO: implement model
       pass 
 
-    elif self.selected_play_type_option == self.PLAY_DESCISION_OPTIONS["PLAYER"]:
+    elif self.selected_play_type_option == "PLAYER":
       # TODO: implement player
       pass 
 
