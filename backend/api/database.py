@@ -9,7 +9,7 @@
 import sqlite3
 import time
 
-from pente.pente import PenteGame
+from .pente.pente import PenteGame
 
 class PenteDatabase():
   def __init__(self) -> None:

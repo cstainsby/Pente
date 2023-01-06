@@ -209,7 +209,7 @@ class PenteGame():
     diag_position_index = adjusted_x_cor + adjusted_y_cor                   # finds the diagonal position within the grid, 
                                                                             #     used to get index of length
     curr_diag_length = grid_diagonal_lengths[diag_position_index]           # get the current diagonal length
-    offset_from_right_diagonal = (adjusted_x_cor - adjusted_y_cor) / 2                      # determines the offset from the "right diagonal" 
+    offset_from_right_diagonal = (adjusted_x_cor - adjusted_y_cor) / 2      # determines the offset from the "right diagonal" 
                                                                             #     from the center point
     middle_index_in_right_diagonal = ((curr_diag_length - 1) / 2)              
     position = offset_from_right_diagonal + middle_index_in_right_diagonal  # the middle index plus the offset yeilds the position 
