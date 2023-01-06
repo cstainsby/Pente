@@ -11,6 +11,7 @@ from pente.pente import PenteGame
 def generate_data(num_game_iters: int, grid_length: int, player_settings: dict):
   
   for i in range(num_game_iters):
+    if i % 10 == 0: print("current itter", i)
     pente_game = PenteGame(GRID_LENGTH=grid_length, player_dict=player_settings)
 
     pente_game.start()

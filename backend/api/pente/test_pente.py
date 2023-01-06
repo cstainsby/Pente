@@ -1,6 +1,6 @@
 import pytest 
 
-from pente.pente import PenteGame
+from .pente import PenteGame
 
 
 # ------------------------------------------------------------------

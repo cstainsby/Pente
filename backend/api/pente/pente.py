@@ -7,6 +7,7 @@
 import random 
 import numpy as np
 import math
+from termcolor import colored
 
 class PenteGame():
   def __init__(self, GRID_LENGTH = 19, player_dict = {1: "RANDOM", 2: "RANDOM"}) -> None:
@@ -42,13 +43,19 @@ class PenteGame():
     
     DESC: a pretty printer for the current game state
     """
+    player_color_mapping = {
+      0: "white", 
+      1: "green",
+      2: "blue"
+    }
+
+
     print("      ", end="")
     for i in range(self.GRID_LENGTH):
       i_indent = "  " + " " * (2 - len(str(i)))
       print(i, end=i_indent)
     print()
 
-    num_spaces = 2
     for i in range(self.GRID_LENGTH):
       i_indent = " " * (2 - len(str(i)))
       print("   ", "----" * self.GRID_LENGTH)
@@ -56,7 +63,7 @@ class PenteGame():
       for j in range(self.GRID_LENGTH):
         grid_val = self.GAME_BOARD[i][j]
         val_indent = " " * (2 - len(str(grid_val)))
-        print("|", grid_val, end=val_indent)
+        print("|", colored(grid_val, player_color_mapping[grid_val]), end=val_indent)
       print()
     print()
 
@@ -108,7 +115,7 @@ class PenteGame():
     if self.GAME_BOARD[y][x] != 0:
       return ValueError
     
-    print("play successfully registered at x:", x, "y:", y, "for player", player_id)
+    # print("play successfully registered at x:", x, "y:", y, "for player", player_id)
 
     self.GAME_BOARD[y][x] = player_id
     self.game_log.append(("PLACEMENT", player_id, x, y))
@@ -302,8 +309,10 @@ class PenteGame():
             self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on + 1] = 0
             self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on + 2] = 0
           elif raw_list_index == 1: # right diagonal 
-            self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on - 1] = 0
-            self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on - 2] = 0
+            # print("check RIGHTDIAG:", intersection_x_played_on + 2, intersection_y_played_on - 2)
+            # print("rs vals", rs_values)
+            self.GAME_BOARD[intersection_y_played_on - 1][intersection_x_played_on + 1] = 0
+            self.GAME_BOARD[intersection_y_played_on - 2][intersection_x_played_on + 2] = 0
           elif raw_list_index == 2: # horizontal
             self.GAME_BOARD[intersection_y_played_on][intersection_x_played_on + 1] = 0
             self.GAME_BOARD[intersection_y_played_on][intersection_x_played_on + 2] = 0
@@ -311,7 +320,7 @@ class PenteGame():
             self.GAME_BOARD[intersection_y_played_on + 1][intersection_x_played_on] = 0
             self.GAME_BOARD[intersection_y_played_on + 2][intersection_x_played_on] = 0
     
-    self.pretty_print_game()
+    # self.pretty_print_game()
 
     
 
@@ -363,7 +372,7 @@ class Player():
     if self.selected_play_type_option == "RANDOM":
       random.shuffle(current_choices)
       choice = current_choices[0] 
-      print("current rand player (id:" + str(self.player_id) + ") choice: " + str(choice))
+      # print("current rand player (id:" + str(self.player_id) + ") choice: " + str(choice))
 
     elif self.selected_play_type_option == "AI":
       # TODO: implement model
