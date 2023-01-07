@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route, Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 
 import SplashPage from "./pages/SplashPage.js";
+import GameSearchPage from './pages/GameSearchPage.js';
 import GamePage from "./pages/GamePage.js";
 import AnalyticsPage from './pages/AnalyticsPage.js';
 import ErrorPage from "./pages/ErrorPage.js";
@@ -19,7 +20,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<SplashPage/>} />
-
+          <Route path="gameSearch" element={<GameSearchPage/>} />
           <Route page="/game">
             <Route path=":gameId" element={<GamePage/>} />
           </Route>
