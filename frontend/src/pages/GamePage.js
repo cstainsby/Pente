@@ -6,7 +6,6 @@ const GamePage = (props) => {
   return (
     <div className="GamePage">
       <GameDisplay/>
-      <GameSpace/>
     </div>
   );
 }
@@ -31,38 +30,11 @@ const GameDisplay = (props) => {
 
   return (
     <div className="GameDisplay">
-      {/* {gameState } */}
+      <svg width="400" height="100">
+        <rect width="400" height="100" />
+      </svg>
     </div>
   )
-}
-
-const GameSpace = (props) => {
-
-  let [currPlayerId, setCurrPlayerId] = useState(null);
-
-  return (
-    <div className="GameSpaceContainer">
-      <GamePiece/>
-      <div className="GameSpaceItem GameSpace">
-        <div className="GameSpaceWhiteSpace" />
-        <div className="GameSpaceWhiteSpace" />
-        <div className="GameSpaceWhiteSpace" />
-        <div className="GameSpaceWhiteSpace" />
-      </div>
-    </div>
-  )
-}
-
-const GamePiece = (props) => {
-  const pieceColorMapping = {
-    0: ""
-  }
-  
-  return (
-    <div className="GameSpaceItem GamePeice">
-
-    </div>
-  );
 }
 
 export default GamePage;

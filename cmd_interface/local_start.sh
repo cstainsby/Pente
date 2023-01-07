@@ -1,0 +1,2 @@
+
+python3 pente_cmd_display.py

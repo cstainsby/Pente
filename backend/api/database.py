@@ -105,9 +105,9 @@ class PenteDatabase():
         """.format(game_id, cap_num, last_place_num, direction))
 
         cap_num += 1
-      
 
-  def get_game_by_game_id(self, game_id):
+
+  def get_game_by_game_id(self, game_id: int):
 
     players_table_res = self.conn.execute("""
       SELECT game_id, grid_length, player_num, player_type
