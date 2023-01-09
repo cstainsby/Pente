@@ -32,6 +32,8 @@ class PenteDatabase():
     
   
   def insert_game(self, pente_game: PenteGame):
+    """insert a pente game into the database 
+    """
     
     game_id = self.get_number_of_games_played()
 

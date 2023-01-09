@@ -1,3 +1,9 @@
+# --------------------------------------------------------------------------
+# FILE: api.py
+# NAME: Cole Stainsby
+# DESC: Contains all fastapi endpoints in this project
+# --------------------------------------------------------------------------
+
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -5,11 +11,11 @@ import json
 
 from .database import PenteDatabase
 from . import models
-from connection_manager import ConnectionManager 
-import pente_game_json_lib
+from .connection_manager import ConnectionManager 
 
 app = FastAPI()
 game_connection_manager = ConnectionManager()
+db = PenteDatabase()
 
 origins = [
   "http://localhost",
@@ -31,20 +37,29 @@ async def test():
   return "hi"
 
 
-@app.get("/games")
-async def get_games():
+@app.get("/play/games")
+async def get_open_games():
   """
-  DESC: gets a list of games 
+  DESC: gets a list of games from the connection manager
   """
-  pass
+  current_connections = game_connection_manager.get_game_connections()
+
+  res = None
+  for conn_info in current_connections:
+    print("conn info", conn_info)
+    res_item = json.dumps({
+      "creator_name": "",
+      "num_players": 0
+    })
+
+  return "test"
 
 
-@app.post("/games")
+@app.post("/play/games")
 async def post_game():
   """
   DESC: posts a game to the availible games in queue
   """
-
   pass
 
 @app.post("/games/{game_id}/players")
@@ -70,8 +85,11 @@ async def game_connect(websocket: WebSocket, game_conn_id: int):
       received_json = await websocket.receive_json()
 
       # determine the "type" of the contents the socket just recieved
-      # NOTE the json should contain a 
-      game_connection_manager.broadcast_message_in_game(game_conn_id, received_json) 
+
+      # determine if 
+      game_connection_manager.broadcast_message_in_game(game_conn_id, received_json)
+
+
   
   except WebSocketDisconnect:
     game_connection_manager.remove_player_from_game(game_conn_id)

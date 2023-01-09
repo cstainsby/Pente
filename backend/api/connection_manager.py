@@ -1,10 +1,16 @@
-
+# --------------------------------------------------------------------------
+# FILE: connection_manager.py
+# NAME: Cole Stainsby
+# DESC: A manager class which holds information related to currently open
+#       games and who is connected to them.
+#       This code leverages websockets to create a publisher-subscriber 
+#       pattern where users will receive only the information they need 
+#       relative to which games they are connected to.
+# --------------------------------------------------------------------------
 
 from fastapi import  WebSocket, WebSocketDisconnect
 from typing import List
 import json
-
-from database import PenteDatabase
 
 
 class ConnectionManager():
@@ -23,6 +29,10 @@ class ConnectionManager():
       self.game_connections.update({game_conn_id: conn})
 
       self.game_connections.update({game_conn_id: GameConnection})
+
+  def get_game_connections(self):
+    
+    return self.game_connections.keys()
 
   def remove_player_from_game(self, game_conn_id: int) -> None:
     if game_conn_id in self.game_connections:
