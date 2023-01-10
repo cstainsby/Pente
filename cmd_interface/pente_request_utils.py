@@ -6,6 +6,7 @@
 # --------------------------------------------------------------------------
 
 import requests
+import json
 
 # possible endpoints for backend 
 LOCAL_ENDPOINT = "http://localhost:8000"
@@ -21,3 +22,20 @@ def get_joinable_games():
     return None 
 
   return res.content
+
+
+def post_game(game_title: str, num_players: int):
+  endpoint = chosen_endpoint_head + "/play/games"
+
+  #TODO make identifiers for people
+  game_info_json = {
+    "game_title": game_title,
+    "created_by": "",
+    "num_players": num_players
+  }
+
+  print("post game info json", game_info_json)
+
+  res = requests.post(endpoint, json=game_info_json)
+
+  print("post response", res.text)

@@ -40,7 +40,6 @@ class PenteCmdDisplay():
       
       "post_game_page": {
         "options": {
-          'b': "Back"
         },
         "print_function": self.post_game_page_print,
         "input_questions": [
@@ -52,6 +51,22 @@ class PenteCmdDisplay():
               \t-> """
           ],
         "input_function": self.post_game_get_input
+      },
+
+      "in_game_page": {
+        "options": {
+          'f': "forfeit"
+        },
+        "print_function": self.in_game_page_print,
+        "input_questions": [
+            """
+              Game Name: \n
+              \t-> """,
+            """
+              Number Of Players in Game: \n
+              \t-> """
+          ],
+        "input_function": self.in_game_get_input
       }
     }
 
@@ -83,7 +98,7 @@ class PenteCmdDisplay():
           if page_res == 1: # switch to online search for games
             self.switch_page("online_game_selection_page")
           elif page_res == 2: # switch to in game page with AI
-            pass
+            self.switch_page("in_game_page")
         
         elif self.current_page == "online_game_selection_page":
           if page_res == 'b':
@@ -97,6 +112,15 @@ class PenteCmdDisplay():
           print("uploading game: ", page_res)
 
           # Post the game to the backend
+          pente_request_utils.post_game(game_name, num_players)
+
+          self.switch_page("online_game_selection_page")
+
+        elif self.current_page == "in_game_page":
+          self.switch_page("splash_page")
+        
+        else:
+          print("Page Error")
 
 
 
@@ -226,7 +250,46 @@ class PenteCmdDisplay():
 
     return res
 
+  # ----------------------------------------------------------------------------------
+  #   In Game Page
+  # ----------------------------------------------------------------------------------
+  def in_game_page_print(self):
+    page_info = self.pages["in_game_page"]
+    page = ""
+    indent = " " * int(self.terminal_cols / 6)
 
+    page += self.build_header("Game Title")
+
+    for option_num, option_label in page_info["options"].items():
+      page += indent + str(option_num) + ") " + option_label + "\n"
+
+    print(page)
+  
+  def in_game_get_input(self):
+    answers = []
+    page_info = self.pages["in_game_page"]
+    
+    questions = page_info["input_questions"]
+    for question in questions:
+      choice = input(question)
+
+      if choice == 'f':
+        return choice
+
+      answers.append(choice)
+
+    # verify that the info is of the correct type
+    #   return None if invalid
+    res = []
+    second_answer = int(answers[1]) # NOTE only the second awnser needs to be checked
+    
+    # if the answer isn't 'n' or 1 or 2
+    if not (int(second_answer) < 5):
+      res = ValueError
+    else:
+      res = [answers[0], int(answers[1])]
+
+    return res
   
 
   # ----------------------------------------------------------------------------------

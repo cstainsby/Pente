@@ -11,10 +11,10 @@ import json
 
 from .database import PenteDatabase
 from . import models
-from .connection_manager import ConnectionManager 
+from .connection_manager import PenteGameConnectionManager 
 
 app = FastAPI()
-game_connection_manager = ConnectionManager()
+game_connection_manager = PenteGameConnectionManager()
 db = PenteDatabase()
 
 origins = [
@@ -38,29 +38,45 @@ async def test():
 
 
 @app.get("/play/games")
-async def get_open_games():
+async def get_open_games_info():
   """
   DESC: gets a list of games from the connection manager
   """
-  current_connections = game_connection_manager.get_game_connections()
+  open_games = game_connection_manager.get_open_games()
 
-  res = None
-  for conn_info in current_connections:
-    print("conn info", conn_info)
-    res_item = json.dumps({
-      "creator_name": "",
-      "num_players": 0
+  returned_list = []
+
+  for key, info_dict in open_games.items():
+    returned_list.append({
+      "connection_key": key,
+      "game_title": info_dict["game_title"],
+      "num_players": info_dict["num_players"],
+      "created_by": info_dict["created_by"],
+      "curr_player_count": len(info_dict["conn_list"])
     })
-
-  return "test"
+  
+  return {"open_game_list": returned_list}
+  
 
 
 @app.post("/play/games")
-async def post_game():
+async def post_game(playableGame: models.PlayableGame):
   """
   DESC: posts a game to the availible games in queue
+        this is done through the connection manager
   """
-  pass
+  print("recieved playable game obj", playableGame)
+
+  conn_key = game_connection_manager.get_availble_connection()
+
+  game_connection_manager.create_game(
+    conn_key, 
+    playableGame.game_title, 
+    playableGame.num_players,
+    playableGame.created_by
+  )
+
+  return playableGame
 
 @app.post("/games/{game_id}/players")
 async def post_game_player_status():
