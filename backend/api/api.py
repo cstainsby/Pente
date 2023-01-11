@@ -65,7 +65,6 @@ async def post_game(playableGame: models.PlayableGame):
   DESC: posts a game to the availible games in queue
         this is done through the connection manager
   """
-  print("recieved playable game obj", playableGame)
 
   conn_key = game_connection_manager.get_availble_connection()
 

@@ -12,7 +12,7 @@ const SplashPage = (props) => {
         <li>
           <Link to={"/gameSearch"}>
             <button type="button" className="NavigationButton">
-              <img src={OnlineButtonIcon} height="24" className="ButtonIcon"/>
+              {/* <img src={OnlineButtonIcon} height="24" className="ButtonIcon"/> */}
               <span className="ButtonText">Online</span>
             </button>
           </Link>
