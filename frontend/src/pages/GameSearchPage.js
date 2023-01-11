@@ -1,12 +1,12 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
 import { getOpenGames } from "../api/requests";
 
 const GameSearchPage = (props) => {
 
-  let [availbleGames, setAvailbleGames] = useState([])
+  const { openGames } = useLoaderData();
 
 
   // useEffect(() => {
@@ -23,15 +23,20 @@ const GameSearchPage = (props) => {
           Back
         </button>
       </Link>
-      <h3>Avalible Games</h3>
+      <h3>Open Games</h3>
 
       <button>Add Game</button>
 
-      {availbleGames.length > 0 &&
-        availbleGames.map(() => {
+      {openGames.length ? (
+        openGames.map(() => {
 
         })
-      } 
+      ) : (
+        <p>
+          <i>No open games</i>
+        </p>
+      )
+      }
 
     </div>
   )

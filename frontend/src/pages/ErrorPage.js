@@ -1,10 +1,16 @@
 
+import { useRouteError } from "react-router-dom";
 
-const ErrorPage = (props) => {
-  <div className="ErrorPage">
-    <h1>404 Error</h1>
-    <p>page not reachable</p>
-  </div>
+export default function ErrorPage() {
+  const error = useRouteError();
+  console.error(error);
+
+  return (
+    <div id="ErrorPage">
+      <h1>Error has occurred</h1>
+      <p>
+        <i>{error.statusText || error.message}</i>
+      </p>
+    </div>
+  );
 }
-
-export default ErrorPage;

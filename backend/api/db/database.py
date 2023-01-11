@@ -9,11 +9,11 @@
 import sqlite3
 import time
 
-from .pente.pente import PenteGame
+from ..pente.pente import PenteGame
 
 class PenteDatabase():
-  def __init__(self) -> None:
-    self.conn = sqlite3.connect("pente.db")
+  def __init__(self, database_name: str = "pente.db") -> None:
+    self.conn = sqlite3.connect(database_name)
 
   def has_valid_connection(self) -> bool:
     if self.conn:

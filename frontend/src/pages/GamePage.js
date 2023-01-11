@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 
 const GamePage = (props) => {
 
   return (
     <div className="GamePage">
-      <GameDisplay/>
+      In Game
+      <Outlet/>
     </div>
   );
 }
@@ -37,4 +39,22 @@ const GameDisplay = (props) => {
   )
 }
 
-export default GamePage;
+const OnlineGameDisplay = (props) => {
+
+}
+
+const AiGameDisplay = (props) => {
+  console.log("Ai game loaded")
+  return (
+    <div>
+      AI Game
+      <GameDisplay/>
+    </div>
+  )
+}
+
+export {
+  GamePage,
+  OnlineGameDisplay,
+  AiGameDisplay
+};

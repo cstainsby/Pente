@@ -18,12 +18,11 @@ const SplashPage = (props) => {
           </Link>
         </li>
         <li>
-          <Link to={"/game"} >
-
+          <Link to={"/game/ai"} >
+            <button type="button" className="NavigationButton">
+              <span className="ButtonText">Play AI</span>
+            </button>
           </Link>
-          <button type="button" className="NavigationButton">
-            <span className="ButtonText">Play AI</span>
-          </button>
         </li>
         <li>
           <Link to={"/analytics"}>
