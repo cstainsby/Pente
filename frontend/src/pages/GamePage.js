@@ -38,11 +38,25 @@ const PlayerTag = (props) => {
 
 const GameLog = (props) => {
 
+  let [gameLog, setGameLog] = useState([]);
+
   return (
     <div id="GameLog">
       <h3>Game Log</h3>
       <div id="GameLogContents">
-
+        
+        { gameLog.length > 0 ? (
+          <ul>
+            {
+              gameLog.map(() => {
+                <li>entry</li>
+              })
+            }
+          </ul>
+        ) : (
+          <h4>No Moves Made</h4> 
+        )
+        }
       </div>
     </div>
   )
@@ -87,6 +101,8 @@ const GameDisplay = (props) => {
         { lineYs.map(y =>
           <line x1={offsetFromOrigin} x2={ boardDisplayLength + offsetFromOrigin } y1={y + offsetFromOrigin} y2={y + offsetFromOrigin} stroke="black" strokeWidth={2}/>
         )}
+
+        <circle r="125"/>
       </svg>
     </div>
   )
