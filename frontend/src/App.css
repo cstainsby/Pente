@@ -51,10 +51,17 @@ svg {
   background-color: grey;
 }
 
-.GamePiece {
-  height: 25px;
-  width: 25px;
-  border-radius: 50%;
+#ActiveToken {
+  visibility: visible;
+}
+
+#InactiveToken {
+  opacity: 0;
+}
+
+#InactiveToken :hover {
+  opacity: 1;
+  color: black;
 }
 
 button {

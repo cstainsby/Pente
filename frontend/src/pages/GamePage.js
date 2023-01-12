@@ -63,7 +63,7 @@ const GameLog = (props) => {
 }
 
 const GameDisplay = (props) => {
-  let [gridLength, setGridLength] = useState(19);
+  let [gridLength, setGridLength] = useState(17);
 
   let [gameState, setGameState] = useState(
     new Array(gridLength).fill(new Array(gridLength).fill(0, 0, gridLength))
@@ -71,7 +71,7 @@ const GameDisplay = (props) => {
   console.log(gameState)
   console.log(gameState.length)
 
-  const boardMargin = 20; // how much margin is around the board 
+  const boardMargin = 40; // how much margin is around the board 
   const offsetFromOrigin = boardMargin / 2; // how much each item within the board needs to be offset
 
   const gameDisplayLength = window.screen.height / 1.5;
@@ -83,7 +83,16 @@ const GameDisplay = (props) => {
   const lineYs = helperCount.map(y => y * lineIntervalSpacing);
 
   // parallel to the game state, holds all x and y intersections relative to the grid
-  const placeableIntersections = []
+  const intersectionCoords = []
+  // fill intersections
+  for(let i = 0; i < lineXs.length; i++) {
+    for(let j = 0; j < lineYs.length; j++) {
+      intersectionCoords.push({
+        "x": lineXs[i], 
+        "y": lineYs[j]
+      });
+    }
+  }
 
 
 
@@ -102,10 +111,37 @@ const GameDisplay = (props) => {
           <line x1={offsetFromOrigin} x2={ boardDisplayLength + offsetFromOrigin } y1={y + offsetFromOrigin} y2={y + offsetFromOrigin} stroke="black" strokeWidth={2}/>
         )}
 
-        <circle r="125"/>
+        {/* place possible positions for playable tokens */}
+        {intersectionCoords.map(coords => 
+          <GameToken xCoord={ coords["x"] + offsetFromOrigin } yCoord={ coords["y"] + offsetFromOrigin } />
+        )}
       </svg>
     </div>
   )
+}
+
+const GameToken = (props) => {
+  // props include 
+  //  xCoord: int
+  //  yCoord: int
+  //  currentPlayerNum 
+
+  let [isVisible, setIsVisible] = useState(false);
+
+  const onEmptyIntersectionClick = () => {
+    console.log("intersection clicked")
+    setIsVisible(true);
+  }
+
+  return (
+    <>
+      {isVisible ? (
+        <circle id="ActiveToken" r="12" cx={props.xCoord} cy={props.yCoord}/>
+      ) : (
+        <circle id="InactiveToken" r="12" cx={props.xCoord} cy={props.yCoord} onClick={ onEmptyIntersectionClick }/>   
+      )}
+    </>
+  );
 }
 
 const GameIntersection = (props) => {
