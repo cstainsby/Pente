@@ -20,23 +20,6 @@ function App() {
   return (
     <div className="App">
       <RouterProvider router={router} />
-      {/* <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SplashPage/>} />
-          <Route path="gameSearch" element={<GameSearchPage/>} />
-
-          <Route page="game" element={<GamePage/>}>
-            <Route page="ai" element={<AiGameDisplay/>}/>
-
-            <Route page="online" element={<GamePage/>}>
-              <Route path=":gameId" element={<GamePage/>}/>
-            </Route>
-          </Route>
-
-          <Route path="analytics" element={ <AnalyticsPage/> }/>
-          <Route path="*" element={<ErrorPage/>} />
-        </Routes>
-      </BrowserRouter> */}
     </div>
   );
 }

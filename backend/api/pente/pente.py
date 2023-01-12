@@ -115,7 +115,6 @@ class PenteGame():
     if self.GAME_BOARD[y][x] != 0:
       return ValueError
     
-    # print("play successfully registered at x:", x, "y:", y, "for player", player_id)
 
     self.GAME_BOARD[y][x] = player_id
     self.game_log.append(("PLACEMENT", player_id, x, y))

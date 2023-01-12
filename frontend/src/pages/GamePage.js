@@ -3,12 +3,41 @@ import { Outlet } from "react-router-dom";
 
 
 const GamePage = (props) => {
+  
+
+  let [gridLength, setGridLength] = useState(17);
+
+  let [gameState, setGameState] = useState(
+    new Array(gridLength).fill(new Array(gridLength).fill(0, 0, gridLength))
+  );
+
+  // How each of the log types should be shaped
+  // placement log shape: (log_id, player_id_who_placed, x, y)
+  // capture log shape: (log_id, player_id_who_captured,  [ordered (x, y) of all stones involved])
+  // win log shape: (log_id, player_id)
+  let [gameLog, setGameLog] = useState([]);
+
+  let [currentPlayer, setCurrentPlayer] = useState("placeholder")
+
+  const notifyBoardStateChange = (changeInfo) => {
+    const changeX = changeInfo["x"];
+    const changeY = changeInfo["y"];
+    const newValue = changeInfo["newValue"];
+    
+    const newLog = {
+      logType: "PLACEMENT" 
+    }
+    gameLog.push([])
+
+    // push this change to the backend, allow it to take care of the logic 
+    // get the new 
+  }
 
   return (
     <div className="GamePage">
       <GameSidebar/>
-      <Outlet/>
-      <GameLog/>
+      <Outlet />
+      <GameLog gameLog={ gameLog }/>
     </div>
   );
 }
@@ -16,7 +45,7 @@ const GamePage = (props) => {
 const GameSidebar = (props) => {
 
   return (
-    <div className="GameSidebar"> 
+    <div id="GameSidebar"> 
       <PlayerTag playerName="AI"/>
     </div>
   )
@@ -37,15 +66,15 @@ const PlayerTag = (props) => {
 }
 
 const GameLog = (props) => {
-
-  let [gameLog, setGameLog] = useState([]);
+  // props include 
+  // gameLog: list of json
 
   return (
     <div id="GameLog">
       <h3>Game Log</h3>
       <div id="GameLogContents">
         
-        { gameLog.length > 0 ? (
+        { props.gameLog.length > 0 ? (
           <ul>
             {
               gameLog.map(() => {
@@ -63,13 +92,10 @@ const GameLog = (props) => {
 }
 
 const GameDisplay = (props) => {
-  let [gridLength, setGridLength] = useState(17);
-
-  let [gameState, setGameState] = useState(
-    new Array(gridLength).fill(new Array(gridLength).fill(0, 0, gridLength))
-  )
-  console.log(gameState)
-  console.log(gameState.length)
+  // props include 
+  // gridLength: int 
+  // gameState: list of list of int
+  // notifyBoardStateChange: func
 
   const boardMargin = 40; // how much margin is around the board 
   const offsetFromOrigin = boardMargin / 2; // how much each item within the board needs to be offset
@@ -94,9 +120,6 @@ const GameDisplay = (props) => {
     }
   }
 
-
-
-
   return (
     <div className="GameDisplay">
       <svg width={ gameDisplayLength } height={ gameDisplayLength }>
@@ -113,7 +136,12 @@ const GameDisplay = (props) => {
 
         {/* place possible positions for playable tokens */}
         {intersectionCoords.map(coords => 
-          <GameToken xCoord={ coords["x"] + offsetFromOrigin } yCoord={ coords["y"] + offsetFromOrigin } />
+          <GameToken 
+            xCoord={ coords["x"] + offsetFromOrigin } 
+            yCoord={ coords["y"] + offsetFromOrigin } 
+            currentPlayerNum={1}
+            notifyBoardStateChange={ props.notifyBoardStateChange }
+          />
         )}
       </svg>
     </div>
@@ -124,13 +152,21 @@ const GameToken = (props) => {
   // props include 
   //  xCoord: int
   //  yCoord: int
-  //  currentPlayerNum 
+  //  currentPlayerNum: int
+  //  notifyBoardStateChange: func
 
   let [isVisible, setIsVisible] = useState(false);
 
   const onEmptyIntersectionClick = () => {
-    console.log("intersection clicked")
     setIsVisible(true);
+
+    // notify the log that a change has happened
+    const changes = {
+      "x": props.xCoord,
+      "y": props.yCoord,
+      "newValue": true
+    }
+    props.notifyBoardStateChange(changes);
   }
 
   return (
@@ -153,6 +189,12 @@ const OnlineGameDisplay = (props) => {
 }
 
 const AiGameDisplay = (props) => {
+  // in the Ai version of the game, websockets will not be used
+  // we wont need to wait on other players to make on a descision rather we only need to query the backend 
+  // model for a response
+
+  // 
+
   console.log("Ai game loaded")
   return (
     <div id="AiGameDisplay">

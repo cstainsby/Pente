@@ -47,7 +47,8 @@ svg {
   block-size: fit-content;
 }
 
-.GameSidebar {
+#GameSidebar,
+#GameLog {
   background-color: grey;
 }
 
