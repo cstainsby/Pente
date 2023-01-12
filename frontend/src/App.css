@@ -9,10 +9,17 @@
   align-items: center;     /* for y axis "cross" axis*/
 }
 
+div {
+  border-radius: 6px;
+}
+
+svg {
+  border-radius: 6px;
+}
+
 .App > div {
   background-color: rgb(171, 170, 170);
   padding: 32px;
-  border-radius: 6px;
 }
 
 /* .SplashPage {
@@ -36,8 +43,12 @@
 }
 
 .GameDisplay {
-  height: 200px;
-  width: 200px;
+  width: fit-content;
+  block-size: fit-content;
+}
+
+.GameSidebar {
+  background-color: grey;
 }
 
 .GamePiece {
