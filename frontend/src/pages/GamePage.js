@@ -106,23 +106,15 @@ const GameLog = (props) => {
       Items in log: {props.gameLog.length}
       
       <div id="GameLogContents">
-        <p>{JSON.stringify(props.gameLog)}</p>
-        <p>{props.gameLog}</p>
-        {
-          props.gameLog.map(logContents => {
-            <p>{logContents}</p>
-          })
-        }
-
         { props.gameLog.length > 0 ? (
           <ul>
             {
               props.gameLog.map((logContents) => {
-                <li>{
-                  <ul>
-                    <li>{JSON.stringify(logContents)}</li>
-                  </ul>
-                }</li>
+                return (
+                  <li id="GameLogContentListItem" className="">{
+                    <p>Player {logContents.player_id} {logContents.log_type}: ({logContents.x}, {logContents.y})</p>
+                  }</li>
+                )
               })
             }
           </ul>

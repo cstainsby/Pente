@@ -34,11 +34,12 @@ svg {
 }
 
 .GamePage {
+  margin: 8px;
   display: grid;
   gap: 1rem;
 
   grid-template-areas: "GameActionsSideBar GameArea" "GameActionsSideBar GameArea GameLog" "GameActionsSideBar GameArea GameLog";
-  grid-template-columns: 0.5fr 2fr 1fr;
+  grid-template-columns: 0.5fr 1fr 1fr;
   /* grid-template-rows: 100px auto; */
 }
 
@@ -50,6 +51,20 @@ svg {
 #GameSidebar,
 #GameLog {
   background-color: grey;
+}
+
+#GameLogContents {
+  background-color: rgb(71, 71, 70);
+  margin: 8px;
+  height: 500px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+#GameLogContentListItem {
+  background-color: rgb(101, 101, 101);
+  border-radius: 6px;
+  margin: 4px;
 }
 
 #ActiveToken {
