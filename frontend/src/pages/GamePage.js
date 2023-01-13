@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useOutletContext } from "react-router-dom";
 
 
 const GamePage = (props) => {
@@ -11,35 +11,65 @@ const GamePage = (props) => {
     new Array(gridLength).fill(new Array(gridLength).fill(0, 0, gridLength))
   );
 
-  // How each of the log types should be shaped
+  // How each of the log types should be shaped 
   // placement log shape: (log_id, player_id_who_placed, x, y)
   // capture log shape: (log_id, player_id_who_captured,  [ordered (x, y) of all stones involved])
   // win log shape: (log_id, player_id)
   let [gameLog, setGameLog] = useState([]);
+  console.log("on game page render" + gameLog.length)
 
   let [currentPlayer, setCurrentPlayer] = useState("placeholder")
+
+  return (
+    <div className="GamePage">
+      <GameSidebar/>
+      <Outlet context={[gameState, setGameState, gameLog, setGameLog]}/>
+      <GameLog gameLog={ gameLog }/>
+    </div>
+  );
+}
+
+const OnlineGameDisplay = (props) => {
+
+}
+
+const AiGameDisplay = (props) => {
+  // in the Ai version of the game, websockets will not be used
+  // we wont need to wait on other players to make on a descision rather we only need to query the backend 
+  // model for a response
+
+  // 
+  const [gameState, setGameState, gameLog, setGameLog] = useOutletContext();
 
   const notifyBoardStateChange = (changeInfo) => {
     const changeX = changeInfo["x"];
     const changeY = changeInfo["y"];
     const newValue = changeInfo["newValue"];
+
+    console.log("notified of state change" + changeX + " " + changeY)
     
     const newLog = {
-      logType: "PLACEMENT" 
+      log_type: "PLACEMENT",
+      x: changeX, 
+      y: changeY,
+      player_id: newValue
     }
-    gameLog.push([])
+    console.log("old log: " + gameLog)
+    let updatedGameLog = [...gameLog]
+    updatedGameLog.push(newLog)
+    console.log("new log: " + updatedGameLog)
+    setGameLog(updatedGameLog)
 
     // push this change to the backend, allow it to take care of the logic 
     // get the new 
   }
 
+  console.log("Ai game loaded")
   return (
-    <div className="GamePage">
-      <GameSidebar/>
-      <Outlet />
-      <GameLog gameLog={ gameLog }/>
+    <div id="AiGameDisplay">
+      <GameDisplay gridLength={gameState.length} notifyBoardStateChange={ notifyBoardStateChange }/>
     </div>
-  );
+  )
 }
 
 const GameSidebar = (props) => {
@@ -68,17 +98,31 @@ const PlayerTag = (props) => {
 const GameLog = (props) => {
   // props include 
   // gameLog: list of json
+  console.log("on log render" + props.gameLog)
 
   return (
     <div id="GameLog">
       <h3>Game Log</h3>
+      Items in log: {props.gameLog.length}
+      
       <div id="GameLogContents">
-        
+        <p>{JSON.stringify(props.gameLog)}</p>
+        <p>{props.gameLog}</p>
+        {
+          props.gameLog.map(logContents => {
+            <p>{logContents}</p>
+          })
+        }
+
         { props.gameLog.length > 0 ? (
           <ul>
             {
-              gameLog.map(() => {
-                <li>entry</li>
+              props.gameLog.map((logContents) => {
+                <li>{
+                  <ul>
+                    <li>{JSON.stringify(logContents)}</li>
+                  </ul>
+                }</li>
               })
             }
           </ul>
@@ -103,8 +147,8 @@ const GameDisplay = (props) => {
   const gameDisplayLength = window.screen.height / 1.5;
   const boardDisplayLength = gameDisplayLength - boardMargin;
   // line X and Ys will hold all info to 
-  const lineIntervalSpacing = boardDisplayLength / gridLength;
-  let helperCount = Array.from({ length: gridLength + 1 }, (_, i) => i);
+  const lineIntervalSpacing = boardDisplayLength / props.gridLength;
+  let helperCount = Array.from({ length: props.gridLength + 1 }, (_, i) => i);
   const lineXs = helperCount.map(x => x * lineIntervalSpacing);
   const lineYs = helperCount.map(y => y * lineIntervalSpacing);
 
@@ -119,6 +163,8 @@ const GameDisplay = (props) => {
       });
     }
   }
+
+  
 
   return (
     <div className="GameDisplay">
@@ -166,6 +212,8 @@ const GameToken = (props) => {
       "y": props.yCoord,
       "newValue": true
     }
+    console.log("changes being accepted " + changes)
+    console.log(props.notifyBoardStateChange)
     props.notifyBoardStateChange(changes);
   }
 
@@ -178,29 +226,6 @@ const GameToken = (props) => {
       )}
     </>
   );
-}
-
-const GameIntersection = (props) => {
-
-}
-
-const OnlineGameDisplay = (props) => {
-
-}
-
-const AiGameDisplay = (props) => {
-  // in the Ai version of the game, websockets will not be used
-  // we wont need to wait on other players to make on a descision rather we only need to query the backend 
-  // model for a response
-
-  // 
-
-  console.log("Ai game loaded")
-  return (
-    <div id="AiGameDisplay">
-      <GameDisplay/>
-    </div>
-  )
 }
 
 export {
