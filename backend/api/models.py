@@ -17,12 +17,3 @@ class PlayableGame(BaseModel):
   game_title: str 
   num_players: int 
   created_by: str
-
-# --------------------------------------------------------------------------
-#   ai game models
-# --------------------------------------------------------------------------
-class GamePlacement(BaseModel):
-  game_state: List[List]
-  player_id: int 
-  x_cor: int 
-  y_cor: int

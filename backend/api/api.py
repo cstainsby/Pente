@@ -4,7 +4,7 @@
 # DESC: Contains all fastapi endpoints in this project
 # --------------------------------------------------------------------------
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 import json
@@ -99,7 +99,7 @@ async def post_game(playableGame: models.PlayableGame):
 
 
 @app.post("/play/games/ai")
-async def post_placement_in_ai_game(gamePlacement: models.GamePlacement):
+async def post_placement_in_ai_game(gamePlacement: str = Query(..., title="The current game state")):
   # TODO: there might be a more efficient way to pass information but this will be the quickest to get running 
 
   # rather than have the game running on the backend 
@@ -126,5 +126,6 @@ async def post_placement_in_ai_game(gamePlacement: models.GamePlacement):
     "new_game_board": game.GAME_BOARD,
     "new_game_log": game.game_log
   }
+  print("backend returning res", res)
 
   return res

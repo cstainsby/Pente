@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, useOutletContext } from "react-router-dom";
 
+import { getAIMove } from "../api/requests";
 
 const GamePage = (props) => {
   
@@ -11,19 +12,18 @@ const GamePage = (props) => {
     new Array(gridLength).fill(new Array(gridLength).fill(0, 0, gridLength))
   );
 
+  let [currentPlayer, setCurrentPlayer] = useState("placeholder")
+
   // How each of the log types should be shaped 
   // placement log shape: (log_id, player_id_who_placed, x, y)
   // capture log shape: (log_id, player_id_who_captured,  [ordered (x, y) of all stones involved])
   // win log shape: (log_id, player_id)
   let [gameLog, setGameLog] = useState([]);
-  console.log("on game page render" + gameLog.length)
-
-  let [currentPlayer, setCurrentPlayer] = useState("placeholder")
 
   return (
     <div className="GamePage">
       <GameSidebar/>
-      <Outlet context={[gameState, setGameState, gameLog, setGameLog]}/>
+      <Outlet context={[gameState, setGameState, gameLog, setGameLog, currentPlayer, setCurrentPlayer]}/>
       <GameLog gameLog={ gameLog }/>
     </div>
   );
@@ -39,35 +39,40 @@ const AiGameDisplay = (props) => {
   // model for a response
 
   // 
-  const [gameState, setGameState, gameLog, setGameLog] = useOutletContext();
+  const [gameState, setGameState, gameLog, setGameLog, currentPlayer, setCurrentPlayer] = useOutletContext();
 
-  const notifyBoardStateChange = (changeInfo) => {
-    const changeX = changeInfo["x"];
-    const changeY = changeInfo["y"];
-    const newValue = changeInfo["newValue"];
+  const notifyBoardStateChange = (notification) => {
+    //NOTE: this function is only called when the user on the local machine edits the board
+    // notification includes only x and y coordinates of changed board position
 
-    console.log("notified of state change" + changeX + " " + changeY)
+    const changeX = notification.x;
+    const changeY = notification.y;
+
+    // update the gameState
+    const newGameState = gameState;
+    console.log("new game state", newGameState)
     
+    // update the game log
     const newLog = {
       log_type: "PLACEMENT",
       x: changeX, 
       y: changeY,
-      player_id: newValue
+      player_id: currentPlayer
     }
-    console.log("old log: " + gameLog)
     let updatedGameLog = [...gameLog]
-    updatedGameLog.push(newLog)
-    console.log("new log: " + updatedGameLog)
+    updatedGameLog.unshift(newLog)
     setGameLog(updatedGameLog)
+
+
 
     // push this change to the backend, allow it to take care of the logic 
     // get the new 
+    getAIMove(gameState)
   }
 
-  console.log("Ai game loaded")
   return (
     <div id="AiGameDisplay">
-      <GameDisplay gridLength={gameState.length} notifyBoardStateChange={ notifyBoardStateChange }/>
+      <GameDisplay gridLength={gameState.length} currentPlayer={ currentPlayer } notifyBoardStateChange={ notifyBoardStateChange }/>
     </div>
   )
 }
@@ -98,21 +103,26 @@ const PlayerTag = (props) => {
 const GameLog = (props) => {
   // props include 
   // gameLog: list of json
-  console.log("on log render" + props.gameLog)
 
   return (
     <div id="GameLog">
       <h3>Game Log</h3>
-      Items in log: {props.gameLog.length}
+      <p>Number of moves made: {props.gameLog.length}</p>
       
       <div id="GameLogContents">
         { props.gameLog.length > 0 ? (
           <ul>
             {
               props.gameLog.map((logContents) => {
+                let logString = "";
+
+                if(logContents.log_type === "PLACEMENT") {
+                  logString = "Player " + logContents.player_id  + " placed on x: " + logContents.x + " y: " + logContents.y;
+                }
+
                 return (
                   <li id="GameLogContentListItem" className="">{
-                    <p>Player {logContents.player_id} {logContents.log_type}: ({logContents.x}, {logContents.y})</p>
+                    <p>{logString}</p>
                   }</li>
                 )
               })
@@ -140,9 +150,9 @@ const GameDisplay = (props) => {
   const boardDisplayLength = gameDisplayLength - boardMargin;
   // line X and Ys will hold all info to 
   const lineIntervalSpacing = boardDisplayLength / props.gridLength;
-  let helperCount = Array.from({ length: props.gridLength + 1 }, (_, i) => i);
-  const lineXs = helperCount.map(x => x * lineIntervalSpacing);
-  const lineYs = helperCount.map(y => y * lineIntervalSpacing);
+  let helperCountArray = Array.from({ length: props.gridLength + 1 }, (_, i) => i);
+  const lineXs = helperCountArray.map(x => x * lineIntervalSpacing);
+  const lineYs = helperCountArray.map(y => y * lineIntervalSpacing);
 
   // parallel to the game state, holds all x and y intersections relative to the grid
   const intersectionCoords = []
@@ -156,6 +166,22 @@ const GameDisplay = (props) => {
     }
   }
 
+  const notifyTokenPositionTaken = (changes) => {
+    // this function is used to convert the returned x and y coords that were given to the GameToken 
+    // function back to useable indexes within the game state array
+    const nonAdjustedXCoord = changes.x - offsetFromOrigin;
+    const nonAdjustedYCoord = changes.y - offsetFromOrigin;
+
+    const indexX = lineXs.findIndex(element => element === nonAdjustedXCoord);
+    const indexY = lineYs.findIndex(element => element === nonAdjustedYCoord);
+    
+    const notification = {
+      x: indexX,
+      y: indexY
+    } 
+
+    props.notifyBoardStateChange(notification)
+  }
   
 
   return (
@@ -178,7 +204,7 @@ const GameDisplay = (props) => {
             xCoord={ coords["x"] + offsetFromOrigin } 
             yCoord={ coords["y"] + offsetFromOrigin } 
             currentPlayerNum={1}
-            notifyBoardStateChange={ props.notifyBoardStateChange }
+            notifyTokenPositionTaken={ notifyTokenPositionTaken }
           />
         )}
       </svg>
@@ -200,13 +226,11 @@ const GameToken = (props) => {
 
     // notify the log that a change has happened
     const changes = {
-      "x": props.xCoord,
-      "y": props.yCoord,
-      "newValue": true
+      x: props.xCoord,
+      y: props.yCoord
     }
-    console.log("changes being accepted " + changes)
-    console.log(props.notifyBoardStateChange)
-    props.notifyBoardStateChange(changes);
+    console.log(JSON.stringify(changes))
+    props.notifyTokenPositionTaken(changes);
   }
 
   return (

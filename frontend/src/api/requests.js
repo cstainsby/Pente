@@ -6,6 +6,10 @@ const LOCAL_ENDPOINT = "http://localhost:8000"
 
 const chosenEndpointHead = LOCAL_ENDPOINT
 
+
+// ------------------------------------------------------------------
+//    General menu requests
+// ------------------------------------------------------------------
 async function getOpenGames() {
   const endpoint = chosenEndpointHead + "/play/games";
 
@@ -36,7 +40,32 @@ async function postOpenGame(gameTitle, numPlayers) {
   return res.json()
 }
 
+
+
+// ------------------------------------------------------------------
+//    AI game requests
+// ------------------------------------------------------------------
+async function getAIMove(gameState) {
+  const params = new URLSearchParams({
+    game_state: gameState
+  });
+
+  const endpoint = chosenEndpointHead 
+    + "/play/games/ai?" 
+    + params.toString();
+
+  console.log("game generated endpoint", endpoint)
+  await fetch(endpoint, )
+  .then(res => {
+    return res.json()
+  })
+  .catch(error => {
+    console.log("Error", error)
+  })
+}
+
 export {
   getOpenGames,
-  postOpenGame
+  postOpenGame,
+  getAIMove
 }
